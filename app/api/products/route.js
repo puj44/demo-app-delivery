@@ -17,3 +17,28 @@ export async function POST(req, res) {
         }));
     }
 }
+export async function GET(req, res) {
+    try {
+        const search = req.nextUrl?.searchParams?.get('search');
+        if (search) {
+            const res = await conn.all(`SELECT * FROM products WHERE LOWER(product_name) LIKE '%' || ? || '%' `, search?.toString().trim());
+            return new Response(JSON.stringify(res), {
+                headers: { "Content-Type": "application/json" },
+                status: 200,
+                message: "Products fetched successfully"
+            });
+        }else{
+            const res = await conn.all(`SELECT * FROM products `);
+            return new Response(JSON.stringify(res), {
+                headers: { "Content-Type": "application/json" },
+                status: 200,
+                message: "Products fetched successfully"
+            });
+        }
+    } catch (err) {
+        return new Response(JSON.stringify({
+            status: 500,
+            message: err.message
+        }));
+    }
+}

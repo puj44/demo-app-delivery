@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react'
+import Card from '@/components/Card/Card';
 const Table = dynamic(
   () =>
     import("@/components/Table/Table"),
@@ -61,11 +62,17 @@ export default function Home() {
   return (
     <div className="col-12 p-3">
       <div className="d-flex mb-3 justify-content-end">
-        <Link className="primary-button py-1 px-2" href="/create-invoice">Create Invoice</Link>
+        <Link className="primary-button py-1 px-2" href="/create-invoice" style={{fontSize:'14px'}}>Create Invoice</Link>
       </div>
-      <div className="custom-table">
-        <Table tableData={invoiceData} formData={Form} />
-      </div>
+      {
+        invoiceData?.length > 0 && invoiceData.map((iD,index)=>{
+          return (
+            <div key={iD.id ?? index+1} className="my-3">
+              <Card  {...iD} />
+            </div>
+          )
+        })
+      }
       <ToastContainer />
     </div>
   )

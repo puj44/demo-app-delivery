@@ -9,7 +9,15 @@ export async function GET(req, res) {
             return new Response(JSON.stringify(res), {
                 headers: { "Content-Type": "application/json" },
                 status: 200,
-                message: "Product fetched successfully"
+                message: "Vendor fetched successfully"
+            });
+        }
+        else{
+            const res = await conn.all(`SELECT * FROM vendors`);
+            return new Response(JSON.stringify(res), {
+                headers: { "Content-Type": "application/json" },
+                status: 200,
+                message: "Vendor fetched successfully"
             });
         }
     } catch (err) {

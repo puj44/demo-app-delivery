@@ -1,8 +1,20 @@
-import SearchableSelect from '@/components/SearchableSelect/SearchableSelect';
+
 import { searchDebounce } from '@/components/common/debounce';
 import axios from 'axios';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
+const SearchableSelect = dynamic(
+  () =>
+    import("@/components/SearchableSelect/SearchableSelect"),
+  { ssr: false }
+);
+const Table = dynamic(
+  () =>
+    import("@/components/Table/Table"),
+  { ssr: false }
+);
 import React, { useEffect, useState } from 'react'
+
 const vendorField = {
   fieldName: "vendor_id",
   label: "vendor_name",
@@ -25,11 +37,42 @@ const loationField = {
     )
   }
 }
-
 const CreateInvoice = () => {
   const [vendors, setVendors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [invoiceData, setInvoiceData] = useState({});
+  const [isCheckValid, setIsCheckValid] = useState(false);
+  const tableForm = [
+    {
+      title:"Product Name",
+      field:"product_name"
+    },
+    {
+      title:"Ordered Qty",
+      field:"ordered_qty",
+      customField:(val,field,idx)=>{
+        return(
+          <input
+            onChange={(e)=>{onChangeSearch(e.target.value,field,idx)}}
+            value={val?.ordered_qty ??""}
+            defaultValue={""}
+            type='number'
+            style={{border:"0px", outline:"0px"}}
+          />
+        )
+      }
+    },
+    {
+      title:"Scanned Qty",
+      field:"scanned_qty",
+      customClass:"text-end"  
+    },
+    {
+      title:"Available Qty",
+      field:"available_qty",
+      customClass:"text-end"
+    },
+  ]
   useEffect(()=>{
 
   },[]);
@@ -55,9 +98,14 @@ const CreateInvoice = () => {
       });
     });
   }
-  const onChangeSearch = (val, field) =>{
+  const onChangeSearch = (val, field,idx) =>{
     if(field?.fieldName === "vendor_id"){
       getVendorSearch(val)
+    }
+    if(idx >= 0){
+      let products = invoiceData?.products;
+      products[idx][field?.field] = val;
+      setInvoiceData({...invoiceData, products: products})
     }
   }
   const onSearchSelect = (val,field) =>{
@@ -66,46 +114,79 @@ const CreateInvoice = () => {
     }
     setInvoiceData({...invoiceData, [field?.fieldName]:val})
   }
-  console.log("dataInv",invoiceData);
   const getConfigData = () =>{
     let data = {};
     data.vendor_id = vendors ?? [];
     data.location_id = locations ?? [];
     return data;
   }
+  const onAddProduct = async(id) =>{
+    await axios.get(`/api/products/${id??""}`).then((res)=>{
+      if(res?.status === 200){
+        let products = invoiceData?.products ?? [];
+        let productExists = false;
+        products?.length && products.filter((pD,idx)=>{
+          if(pD?.id === res?.data?.id){
+            productExists = idx;
+          }
+        });
+        console.log("exists",productExists);
+        if(productExists === false){
+          products.push({
+            ...res?.data, scanned_qty:1
+          });
+        }else{
+          products[productExists] = {...products[productExists], scanned_qty:products[productExists].scanned_qty+1};
+        };
+        setInvoiceData({...invoiceData, products:products});
+      }
+    }).catch((err)=>{
+      toast.error('Error fetching product', {
+        position: toast.POSITION.BOTTOM_RIGHT
+      });
+    });
+  }
   return (
     <div className="col-12 px-3 my-4" style={{height:"100vh"}}>
       <div className="d-flex mb-2 justify-content-end">
         <Link className="primary-button py-1 px-3" href="/" style={{fontSize:'14px'}}>Go Back</Link>
       </div>
-        <div className="d-flex flex-column w-100">
-          <div className="pb-1">
-            Select vendor
-          </div>
-          <div>
-            <SearchableSelect
-              configData={getConfigData()}
-              field={vendorField}
-              data={invoiceData}
-              onChangeSearch={searchDebounce(onChangeSearch)}
-              onSearchSelect={onSearchSelect}
-            />
-          </div>
+      <div className="d-flex flex-column w-100">
+        <div>
+          <SearchableSelect
+            title={"Select vendor"}
+            configData={getConfigData()}
+            field={vendorField}
+            data={invoiceData}
+            onChangeSearch={searchDebounce(onChangeSearch)}
+            onSearchSelect={onSearchSelect}
+            isCheckValid={isCheckValid}
+          />
         </div>
-        <div className="d-flex flex-column my-2 w-100">
-          <div className="pb-1">
-            Select location
-          </div>
-          <div>
-            <SearchableSelect
-              configData={getConfigData()}
-              field={loationField}
-              data={invoiceData}
-              onChangeSearch={searchDebounce(onChangeSearch)}
-              onSearchSelect={onSearchSelect}
-            />
-          </div>
+      </div>
+      <div className="d-flex flex-column my-2 w-100">
+        <div>
+          <SearchableSelect
+            title={"Select location"}
+            configData={getConfigData()}
+            field={loationField}
+            data={invoiceData}
+            onChangeSearch={searchDebounce(onChangeSearch)}
+            onSearchSelect={onSearchSelect}
+            isCheckValid={isCheckValid}
+          />
         </div>
+      
+      </div>
+      <div className="mt-4 d-flex flex-row justify-content-end">
+        <button className="primary-button py-1 px-3 " onClick={()=>{onAddProduct(1);}}>Add Product</button>
+      </div>
+      <div className="mt-3 custom-table">
+          <Table 
+            tableData={invoiceData?.products ?? []}
+            formData={tableForm}
+          />
+      </div>
     </div>
   )
 }

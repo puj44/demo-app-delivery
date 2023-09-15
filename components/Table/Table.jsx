@@ -20,7 +20,7 @@ const Table = ({tableData, formData}) =>{
                             <tr key={idx}>
                                 {formData?.length && formData?.map((fD,i)=>{
                                     return(
-                                        <td className="py-2 pe-1" key={fD.field+idx+i}>{fD?.customField ? fD?.customField(rowValue):rowValue?.[fD?.field]}</td>
+                                        <td className="py-2 pe-1" key={fD.field+idx+i}>{fD?.customField ? fD?.customField(rowValue,fD,idx):rowValue?.[fD?.field]}</td>
                                     )
                                 })}
                             </tr>

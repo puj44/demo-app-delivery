@@ -5,10 +5,14 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react'
-import Card from '@/components/Card/Card';
 const Table = dynamic(
   () =>
     import("@/components/Table/Table"),
+  { ssr: false }
+);
+const Card = dynamic(
+  () =>
+    import("@/components/Card/Card"),
   { ssr: false }
 );
 export default function Home() {

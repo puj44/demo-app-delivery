@@ -142,8 +142,8 @@ const CreateInvoice = () => {
     setLog("err:",(err)?.toString()?.trim());
     // setShow(false);
   }
-  const onAddProduct = async(id) =>{
-    await axios.get(`/api/products/${id??""}`).then((res)=>{
+  const onAddProduct = async(code) =>{
+    await axios.get(`/api/products/code/${code??""}`).then((res)=>{
       if(res?.status === 200){
         let products = invoiceData?.products ?? [];
         let productExists = false;

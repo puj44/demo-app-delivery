@@ -1,11 +1,18 @@
 
+
 import { searchDebounce } from '@/components/common/debounce';
 import axios from 'axios';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+
 const SearchableSelect = dynamic(
   () =>
     import("@/components/SearchableSelect/SearchableSelect"),
+  { ssr: false }
+);
+const QrScan = dynamic(
+  () =>
+    import("@/components/QrScan/QrScan"),
   { ssr: false }
 );
 const Table = dynamic(
@@ -42,6 +49,8 @@ const CreateInvoice = () => {
   const [locations, setLocations] = useState([]);
   const [invoiceData, setInvoiceData] = useState({});
   const [isCheckValid, setIsCheckValid] = useState(false);
+  const [show,setShow] = useState(false);
+  const [log, setLog] = useState(false);
   const tableForm = [
     {
       title:"Product Name",
@@ -120,6 +129,19 @@ const CreateInvoice = () => {
     data.location_id = locations ?? [];
     return data;
   }
+
+  const handleScan = (text,result) =>{
+    if(res !== null){
+      // setShow(false);
+    }
+    console.log("asdasd",text,result);
+    setLog("result:",(text+result)?.toString()?.trim());
+  }
+  const handleError = (err) =>{
+    console.log("err",err);
+    setLog("err:",(err)?.toString()?.trim());
+    // setShow(false);
+  }
   const onAddProduct = async(id) =>{
     await axios.get(`/api/products/${id??""}`).then((res)=>{
       if(res?.status === 200){
@@ -179,14 +201,24 @@ const CreateInvoice = () => {
       
       </div>
       <div className="mt-4 d-flex flex-row justify-content-end">
-        <button className="primary-button py-1 px-3 " onClick={()=>{onAddProduct(1);}}>Add Product</button>
+        <button className="primary-button py-1 px-3 " onClick={()=>{setShow(true);}}>Add Product</button>
       </div>
+      <div className="d-flex flex-row mt-4">{log}</div>
       <div className="mt-3 custom-table">
           <Table 
             tableData={invoiceData?.products ?? []}
             formData={tableForm}
           />
       </div>
+      {show &&
+      <QrScan 
+        show={show}
+        fps={30}
+        qrbox={250}
+        disableFlip={false}
+        qrCodeSuccessCallback={handleScan}
+        qrCodeErrorCallback={handleError}
+      />}
     </div>
   )
 }

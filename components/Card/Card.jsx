@@ -1,7 +1,6 @@
 import React from 'react'
 import moment from 'moment/moment';
 const Card = ({date, invoice_number, total_ordered_qty, total_products, location_name, vendor_name, total_scanned_qty}) => {
-    console.log("here",date);
   return (
     <div className="card rounded py-2" style={{background:"rgb(234 237 247)", border:"0px", boxShadow:"rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px"}}>
         <div className="px-3 pb-2 fw-bolder d-flex flex-row align-content-center" style={{fontSize:"16px", borderBottom:"1px solid rgb(78, 109, 219)",boxShadow:"rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px"}}>

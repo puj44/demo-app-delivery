@@ -4,52 +4,7 @@ import validator from "../../../components/common/validator"
 import sqlite3 from "sqlite3";
 import arrayValidator from "@/components/common/arrayValidation";
 const conn = await db();
-function db_run_promise(sql, arrayParam) {
-    return new Promise((resolve, reject) => {
-        conn.run(...sql, (err) => {
-            if (err) {
-                resolve(false);
-            }
-            else {
-                resolve(true);
-            }
-        })
-    });
-}
-async function multipleExecSQLWithTransaction(arraySqls) {
 
-    let auxPromise = new Promise((resolve, reject) => {
-        const myfunc = async () => {
-            let passed = true;
-            for (var i = 0; i < arraySqls.length; i++) {
-                let theSql = arraySqls[i];
-                auxResult = await db_run_promise(theSql);
-                if (auxResult == false) {
-                    passed = false;
-                    break;
-                }
-            }
-            if (passed == false) {
-                conn.exec("ROLLBACK");
-                return false;
-            }
-            else {
-                conn.exec("COMMIT");
-                return true;
-            }
-        }
-
-        try {
-            let aux = myfunc();
-            resolve(aux);
-        }
-        catch (errT) {
-            resolve(false);
-        }
-    });
-
-    return auxPromise;
-}
 export async function POST(req, res) {
     try {
         await conn.exec("SAVEPOINT BEFORE_INVOICE");
@@ -99,8 +54,10 @@ export async function POST(req, res) {
             const number = val + 1;
             data.invoice_number = "INV" + number;
         }
-       
-        const res = await conn.run("INSERT INTO invoices(invoice_number, vendor_id, location_id, created_at) VALUES(?,?,?,datetime('now','localtime'))", [data.invoice_number, data.vendor_id, data.location_id])
+        let res = {};
+        await conn.run("INSERT INTO invoices(invoice_number, vendor_id, location_id, created_at) VALUES(?,?,?,datetime('now','localtime'))", [data.invoice_number, parseInt(data.vendor_id), parseInt(data.location_id)]).then((respo)=>{
+            res = respo;
+        })
             .catch((err) => {
                 throw new Error(err)
             });
@@ -109,6 +66,7 @@ export async function POST(req, res) {
         const invoiceID = res?.lastID;
         if (invoiceID) {
             if (data.products?.length) {
+                
                 let statements = [];
                 let errors = [];
                 let productsDetails = [];
@@ -126,6 +84,7 @@ export async function POST(req, res) {
                     }
                 })
                 .catch(err => {errors.push(err)});
+               
                 if(errors.length){
                     await rollbackToSavePoint("BEFORE_INVOICE");
                     throw new Error(errors)
@@ -147,8 +106,8 @@ export async function POST(req, res) {
                     return data;
                 });
                 if(errors.length){
-                    await rollbackToSavePoint("BEFORE_INVOICE");
-                    throw new Error(errors)
+                     rollbackToSavePoint("BEFORE_INVOICE");
+                    throw new Error(errors);
                 }
                 productsData?.length && productsData?.map((pD, idx) => {
                     if (pD?.id) {
@@ -168,7 +127,6 @@ export async function POST(req, res) {
                     rollbackToSavePoint("BEFORE_INVOICE");
                     throw new Error(response[errIndex].message);
                 }
-                // console.log("here");
                 statements = [];
                 data.products.map((product)=>{
                     statements.push(["INSERT INTO invoice_details(invoice_id, product_id, ordered_qty, scanned_qty) VALUES(?,?,?,?) ", [invoiceID, product.product_id, product.ordered_qty, product.scanned_qty]]);
@@ -186,7 +144,6 @@ export async function POST(req, res) {
                     rollbackToSavePoint("BEFORE_INVOICE");
                     throw new Error(insertResponse[errIdx].message);
                 }
-                // await rollbackToSavePoint("BEFORE_INVOICE");
          
             } else {
                 await rollbackToSavePoint("BEFORE_INVOICE", "At least one product is required");
@@ -195,7 +152,7 @@ export async function POST(req, res) {
         else {
             return new Response(JSON.stringify({ status: 500, message: "Error While creating Invoice" }));
         }
-        await conn.exec("RELEASE BEFORE_INVOICE")
+        await conn.exec("RELEASE BEFORE_INVOICE");
         return new Response(JSON.stringify({ status: 200, message: "Invoice created successfully" }));
     } catch (err) {
         await conn.exec("RELEASE BEFORE_INVOICE")

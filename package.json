@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": " next dev",
     "build": "next build",
-    "start": "next start",
+    "start": " next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -31,5 +31,8 @@
     "sass": "^1.67.0",
     "sqlite": "^5.0.1",
     "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.4.9"
   }
 }

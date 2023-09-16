@@ -7,7 +7,7 @@ let db = null;
 const dbConnection = async (req, res) => {
     if (!db) {
         db = await open({
-            filename: "./collection.db",
+            filename: "./public/collection.db",
             driver: sqlite3.Database,
         });
     }

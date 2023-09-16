@@ -55,7 +55,7 @@ export default function Home() {
   useEffect(() => {
     axios.get('/api/invoices/list').then((res)=>{
       if(res?.status === 200){
-        // setInvoiceData([...res?.data ?? []]);
+        setInvoiceData([...res?.data ?? []]);
       }
     }).catch((err)=>{
       toast.error('Error fetching invoices', {

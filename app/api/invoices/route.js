@@ -218,3 +218,5 @@ export async function DELETE(req, res) {
         }));
     }
 }
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true

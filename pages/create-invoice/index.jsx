@@ -263,14 +263,14 @@ const CreateInvoice = () => {
   }
   
   return (
-    <div className="col-12 px-3 my-4" style={{height:"100vh"}}>
-      <div className="d-flex mb-2 justify-content-end">
-        <Link className="primary-button py-1 px-3" href="/" style={{fontSize:'14px'}}>Go Back</Link>
+    <div className="col-12  my-3" style={{height:"100vh"}}>
+      <div className="d-flex mb-2 px-3 justify-content-start header">
+        <Link className="primary-button py-1 px-3" href="/" style={{fontSize:'14px'}}>Back</Link>
       </div>
-      <div className="d-flex flex-column w-100">
+      <div className="d-flex flex-column w-100 px-3 mt-4" style={{fontSize:"14px"}}>
         <div>
           <SearchableSelect
-            title={"Select vendor"}
+            title={"Select Vendor"}
             configData={getConfigData()}
             field={vendorField}
             data={invoiceData}
@@ -280,10 +280,10 @@ const CreateInvoice = () => {
           />
         </div>
       </div>
-      <div className="d-flex flex-column my-2 w-100">
+      <div className="d-flex flex-column my-2 w-100 px-3" style={{fontSize:"14px"}}>
         <div>
           <SearchableSelect
-            title={"Select location"}
+            title={"Select Location"}
             configData={getConfigData()}
             field={loationField}
             data={invoiceData}
@@ -294,10 +294,10 @@ const CreateInvoice = () => {
         </div>
       
       </div>
-      <div className="mt-4 d-flex flex-row justify-content-end">
+      <div className="mt-4 d-flex flex-row justify-content-end px-3">
         <button className="primary-button py-1 px-3 " onClick={()=>{setShow(true);}}>Add Product</button>
       </div>
-      <div className="mt-3 custom-table">
+      <div className="mt-3 custom-table px-3">
           <Table 
             tableData={invoiceData?.products ?? []}
             formData={tableForm}
@@ -314,8 +314,8 @@ const CreateInvoice = () => {
         rememberLastUsedCamera={true}
         handleClose={handleClose}
       />}
-      <div className="mt-3 d-flex flex-row justify-content-center">
-        <button className="primary-button py-1 px-4 " disabled={invoiceData?.products && invoiceData?.products?.length > 0 ? false:true} onClick={()=>{handleSubmit()}} style={{fontSize:'14px'}}>Submit</button>
+      <div className="mt-3 d-flex flex-row justify-content-center px-3">
+        <button className="primary-button py-1 px-4 " disabled={invoiceData?.products && invoiceData?.products?.length > 0 ? false:true} onClick={()=>{handleSubmit()}} style={{fontSize:'14px', background:invoiceData?.products && invoiceData?.products?.length > 0 ? "":"#dddddd", borderColor:invoiceData?.products && invoiceData?.products?.length > 0 ? "":"#dddddd"}}>Submit</button>
       </div>
     </div>
   )

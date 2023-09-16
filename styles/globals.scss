@@ -13,7 +13,8 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: sans-serif;
+  font-family: "Gill Sans", sans-serif;
+  font-weight:400;
 }
 
 html,
@@ -75,4 +76,9 @@ a {
     width:100%;
     white-space:nowrap;
   }
+}
+.header{
+  border-bottom:1px solid rgb(78 109 219);
+  padding-bottom:14px;
+  box-shadow:rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px
 }

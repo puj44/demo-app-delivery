@@ -55,7 +55,7 @@ export default function Home() {
   useEffect(() => {
     axios.get('/api/invoices/list').then((res)=>{
       if(res?.status === 200){
-        setInvoiceData([...res?.data ?? []]);
+        // setInvoiceData([...res?.data ?? []]);
       }
     }).catch((err)=>{
       toast.error('Error fetching invoices', {
@@ -64,19 +64,23 @@ export default function Home() {
     });
   }, [])
   return (
-    <div className="col-12 p-3">
-      <div className="d-flex mb-3 justify-content-end">
+    <div className="col-12 ">
+      <div className="d-flex mb-3 pt-3 px-3 justify-content-end header">
         <Link className="primary-button py-1 px-2" href="/create-invoice" style={{fontSize:'14px'}}>Create Invoice</Link>
       </div>
-      {
-        invoiceData?.length > 0 && invoiceData.map((iD,index)=>{
-          return (
-            <div key={iD.id ?? index+1} className="my-3">
-              <Card  {...iD} />
-            </div>
-          )
-        })
-      }
+      <div className='px-3'>
+
+        {
+          invoiceData?.length > 0 ? invoiceData.map((iD,index)=>{
+            return (
+              <div key={iD.id ?? index+1} className="my-3">
+                <Card  {...iD} />
+              </div>
+            )
+          }):
+          <div className="d-flex flex-row justify-content-center ">No Invoices found</div>
+        }
+      </div>
       
     </div>
   )

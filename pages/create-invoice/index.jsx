@@ -81,15 +81,21 @@ const CreateInvoice = () => {
     {
       title:"Available Qty",
       field:"available_qty",
-      customStyle:(row)=>{
+      customField:(row)=>{
         const colorVal = (parseInt(row?.available_qty??0) <= 0) || (parseInt(row?.scanned_qty) > parseInt(row?.available_qty)) ? "#d72c0d" : parseInt(row?.scanned_qty) === parseInt(row?.ordered_qty) ? "#008000":"#fff4c3";
-        return{
-          background: colorVal,
-          color:colorVal !== "#fff4c3" ? "#fff":"",
-          textAlign: "center",
-          padding:"4px"
-        }
-      }
+
+        return(
+          <div 
+            className="mx-3 py-1"
+            style={{
+            background: colorVal,
+            color:colorVal !== "#fff4c3" ? "#fff":"",
+            textAlign: "center",
+          }}>
+            {row?.available_qty}
+          </div>
+        )
+      },
     },
     {
       title:"",
